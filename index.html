@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporary DataShare and Receive</title>
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-color: #1F2937;
+            --border-color: #E5E7EB;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 15px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #6B7280;
+            font-size: 0.95rem;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            flex: 1;
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            min-height: 48px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .tab-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            background-color: #F3F4F6;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .code-display {
+            display: none;
+            margin-top: 20px;
+            padding: 16px;
+            background-color: #EEF2FF;
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .code-display h4 {
+            font-size: 0.85rem;
+            color: #4B5563;
+            text-transform: uppercase;
+        }
+
+        .code-display .code-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            letter-spacing: 4px;
+            margin: 6px 0;
+        }
+
+        .received-data-box {
+            display: none;
+            margin-top: 20px;
+            padding: 16px;
+            background: #F9FAFB;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            word-break: break-word;
+        }
+
+        @media (min-width: 768px) {
+            .main-container {
+                flex-direction: row;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>DataWEB-Share & Receive</h1>
+        <p>Transfer files or text instantly using a temporary 6-digit code</p>
+    </header>
+
+    <main class="main-container">
+
+        <!-- SECTION 1: SHARE DATA -->
+        <section class="card">
+            <h2>Share Data</h2>
+
+            <label>Select Data Type:</label>
+            <div class="tab-group">
+                <button type="button" class="tab-btn active" onclick="switchTab('text')">Text / Notes</button>
+                <button type="button" class="tab-btn" onclick="switchTab('pdf')">PDF Document</button>
+                <button type="button" class="tab-btn" onclick="switchTab('file')">Other Files</button>
+            </div>
+
+            <form id="shareForm" onsubmit="handleShare(event)">
+                <div id="textInput" class="tab-content active">
+                    <label for="textContent">Paste Your Content/Text:</label>
+                    <textarea id="textContent" rows="5" placeholder="Enter text, code snippets, or links here..."></textarea>
+                </div>
+
+                <div id="pdfInput" class="tab-content">
+                    <label for="pdfFile">Select PDF File:</label>
+                    <input type="file" id="pdfFile" accept="application/pdf">
+                </div>
+
+                <div id="fileInput" class="tab-content">
+                    <label for="generalFile">Select Any File:</label>
+                    <input type="file" id="generalFile">
+                </div>
+
+                <button type="submit" class="btn">Generate Share Code</button>
+            </form>
+
+            <div id="codeDisplay" class="code-display">
+                <h4>Your Transfer Code</h4>
+                <div id="codeValue" class="code-number">------</div>
+                <p style="font-size: 0.8rem; color: #6B7280;">Share this 6-digit code with the receiver (Expires in 10 mins).</p>
+            </div>
+        </section>
+
+        <!-- SECTION 2: RECEIVE DATA -->
+        <section class="card">
+            <h2>Receive Data</h2>
+            
+            <form id="receiveForm" onsubmit="handleReceive(event)">
+                <label for="receiveCode">Enter 6-Digit Code:</label>
+                <input type="text" id="receiveCode" maxlength="6" placeholder="e.g. 482910" required pattern="\d{6}">
+
+                <button type="submit" class="btn">Fetch Data</button>
+            </form>
+
+            <div id="receivedDataBox" class="received-data-box">
+                <h4 style="margin-bottom: 8px;">Received Content:</h4>
+                <div id="receivedContent"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        let currentTab = 'text';
+
+        function switchTab(type) {
+            currentTab = type;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (type === 'text') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('textInput').classList.add('active');
+            } else if (type === 'pdf') {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('pdfInput').classList.add('active');
+            } else if (type === 'file') {
+                document.querySelectorAll('.tab-btn')[2].classList.add('active');
+                document.getElementById('fileInput').classList.add('active');
+            }
+        }
+
+        async function handleShare(event) {
+            event.preventDefault();
+            const formData = new FormData();
+            formData.append('data_type', currentTab);
+
+            if (currentTab === 'text') {
+                const text = document.getElementById('textContent').value;
+                if (!text.trim()) return alert("Please enter text content.");
+                formData.append('text_content', text);
+            } else if (currentTab === 'pdf') {
+                const fileInput = document.getElementById('pdfFile');
+                if (!fileInput.files[0]) return alert("Please select a PDF file.");
+                formData.append('file', fileInput.files[0]);
+            } else if (currentTab === 'file') {
+                const fileInput = document.getElementById('generalFile');
+                if (!fileInput.files[0]) return alert("Please select a file.");
+                formData.append('file', fileInput.files[0]);
+            }
+
+            try {
+                const response = await fetch('/share', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('codeValue').innerText = result.code;
+                    document.getElementById('codeDisplay').style.display = 'block';
+                } else {
+                    alert(result.detail || "Error saving data");
+                }
+            } catch (err) {
+                alert("Network error: Could not reach backend server.");
+            }
+        }
+
+        async function handleReceive(event) {
+            event.preventDefault();
+            const codeEntered = document.getElementById('receiveCode').value;
+            const contentBox = document.getElementById('receivedContent');
+            const outputWrapper = document.getElementById('receivedDataBox');
+
+            const formData = new FormData();
+            formData.append('code', codeEntered);
+
+            try {
+                const response = await fetch('/receive', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (response.ok) {
+                    if (result.type === 'text') {
+                        contentBox.innerHTML = `
+                            <p style="white-space: pre-wrap; background: #EEE; padding: 10px; border-radius: 4px;">${result.content}</p>
+                            <p style="margin-top: 8px; font-size: 0.8rem; color: #DC2626;">⏳ Expires in ${result.expires_in} seconds</p>
+                        `;
+                    } else if (result.type === 'file') {
+                        contentBox.innerHTML = `
+                            <p><strong>File Name:</strong> ${result.filename}</p>
+                            <a href="/download/${codeEntered}" class="btn" style="margin-top: 10px; text-decoration: none; line-height: 20px;">Download File</a>
+                            <p style="margin-top: 8px; font-size: 0.8rem; color: #DC2626;">⏳ Expires in ${result.expires_in} seconds</p>
+                        `;
+                    }
+                    outputWrapper.style.display = 'block';
+                } else {
+                    contentBox.innerHTML = `<p style="color: red;">❌ ${result.detail || "Invalid code"}</p>`;
+                    outputWrapper.style.display = 'block';
+                }
+            } catch (err) {
+                alert("Network error: Could not fetch data.");
+            }
+        }
+    </script>
+</body>
+</html>
