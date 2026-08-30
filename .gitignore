@@ -1,0 +1,4 @@
+virtual/
+uploads/
+__pycache__/
+.env

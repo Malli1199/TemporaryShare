@@ -1,0 +1,4 @@
+redis
+uvicorn[standard]
+redis
+python-multipart
