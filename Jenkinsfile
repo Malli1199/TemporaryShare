@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE_NAME = 'malli1199/datashare-web'
-        DOCKER_TAG        = "${BUILD_NUMBER}" // Name configured in Jenkins Global Tool Configuration
+        DOCKER_TAG        = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -17,11 +17,11 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    def scannerHome = tool "sonar-scanner"
                     echo 'Scanning main.py and project files with SonarQube...'
-                    withSonarQubeEnv('MY-SONAR-SERVER') { // Name configured in Jenkins System Configuration
+                    // Matches your configured SonarQube server name in Jenkins
+                    withSonarQubeEnv('MY-SONAR-SERVER') { 
                         bat """
-                            "${SONAR_SCANNER_HOME}\\bin\\sonar-scanner.bat" ^
+                            sonar-scanner ^
                             -Dsonar.projectKey=DataShareWEB ^
                             -Dsonar.projectName=DataShareWEB ^
                             -Dsonar.sources=. ^
