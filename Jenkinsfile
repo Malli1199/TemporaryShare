@@ -20,7 +20,8 @@ pipeline {
                     echo 'Scanning main.py and project files with SonarQube...'
                     withSonarQubeEnv('MY-SONAR-SERVER') {
                         // Ensure this path matches the exact location of sonar-scanner.bat on your PC
-                        bat '"C:\sonar-scanner\sonar-scanner-6.1.0.4477-windows-x64\bin\sonar-scanner.bat" -Dsonar.projectKey=DataShareWEB -Dsonar.projectName=DataShareWEB -Dsonar.sources=. -Dsonar.exclusions=virtual/** -Dsonar.language=py'
+                       // INCORRECT (Causes Groovy compilation crash)
+                       bat '"C:\sonar-scanner\sonar-scanner-6.1.0.4477-windows-x64\bin\sonar-scanner.bat" -Dsonar.projectKey=DataShareWEB -Dsonar.projectName=DataShareWEB -Dsonar.sources=. -Dsonar.exclusions=virtual/** -Dsonar.language=py'
                     }
                 }
             }
