@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE_NAME = 'malli1199/datashare-web'
         DOCKER_TAG        = "${BUILD_NUMBER}"
+        DOCKER_HOST = 'tcp://127.0.0.1:2375'
     }
 
     stages {
