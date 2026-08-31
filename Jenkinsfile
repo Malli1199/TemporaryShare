@@ -18,16 +18,9 @@ pipeline {
             steps {
                 script {
                     echo 'Scanning main.py and project files with SonarQube...'
-                    // Matches your configured SonarQube server name in Jenkins
-                    withSonarQubeEnv('MY-SONAR-SERVER') { 
-                        bat """
-                            sonar-scanner ^
-                            -Dsonar.projectKey=DataShareWEB ^
-                            -Dsonar.projectName=DataShareWEB ^
-                            -Dsonar.sources=. ^
-                            -Dsonar.exclusions=virtual/** ^
-                            -Dsonar.language=py
-                        """
+                    withSonarQubeEnv('MY-SONAR-SERVER') {
+                        // Ensure this path matches the exact location of sonar-scanner.bat on your PC
+                        bat '"C:\sonar-scanner\sonar-scanner-6.1.0.4477-windows-x64\bin\sonar-scanner.bat" -Dsonar.projectKey=DataShareWEB -Dsonar.projectName=DataShareWEB -Dsonar.sources=. -Dsonar.exclusions=virtual/** -Dsonar.language=py'
                     }
                 }
             }
@@ -35,23 +28,27 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image for FastAPI + Redis stack...'
+                echo 'Building Docker image for FastAPI stack...'
                 bat "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_TAG} -t ${DOCKER_IMAGE_NAME}:latest ."
             }
         }
 
-        stage('Deploy Container Stack') {
+        stage('Deploy Container') {
             steps {
-                echo 'Deploying application with Docker Compose...'
-                bat 'docker compose down || exit 0'
-                bat 'docker compose up -d --build'
+                echo 'Deploying application container with Docker CLI...'
+                // Stop and remove existing container if running
+                bat 'docker stop datashare-web-app || exit 0'
+                bat 'docker rm datashare-web-app || exit 0'
+                
+                // Run the newly built container on port 8000
+                bat "docker run -d --name datashare-web-app -p 8000:8000 ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed! FastAPI container is live on port 8000.'
+            echo 'Pipeline completed successfully! FastAPI container is live on port 8000.'
         }
         failure {
             echo 'Pipeline failed. Check build logs.'
