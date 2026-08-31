@@ -1,12 +1,11 @@
-From python:3.19-slim
+From python:3.11-slim
 
 Workdir /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY main.py .
-COPY index.html .
+COPY . .
 
 Expose 8000
 
