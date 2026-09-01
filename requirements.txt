@@ -2,3 +2,4 @@ redis
 uvicorn[standard]
 redis
 python-multipart
+fastapi>=0.100.0

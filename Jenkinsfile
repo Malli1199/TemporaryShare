@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+    triggers{
+        githubPush()
+    }
     environment {
         DOCKER_IMAGE_NAME = 'malli1199/datashare-web'
         DOCKER_TAG        = "${BUILD_NUMBER}"
