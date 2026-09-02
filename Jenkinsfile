@@ -31,10 +31,12 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image for FastAPI stack...'
-                bat "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_TAG} -t ${DOCKER_IMAGE_NAME}:latest ."
+                    withEnv(['DOCKER_HOST=npipe:////./pipe/docker_engine']) {
+                    bat 'docker build -t malli1199/datashare-web:1 -t malli1199/datashare-web:latest .'
+                }
             }
         }
+
 
         stage('Deploy Container') {
             steps {
@@ -57,4 +59,3 @@ pipeline {
             echo 'Pipeline failed. Check build logs.'
         }
     }
-}
